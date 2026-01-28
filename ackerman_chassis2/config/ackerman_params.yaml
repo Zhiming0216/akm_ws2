@@ -1,0 +1,12 @@
+chassis_driver_node2:
+    ros__parameters:
+        can_dev: "can0"
+        wheelbase: 1.04
+        steering_ratio: 12.5
+        max_steer_wheel_deg: 250
+        wheel_radius: 0.17
+        kingpin_offset: 0.61
+        reduction_ratio: 23
+        odom_init_x: 0.0
+        odom_init_y: 0.0
+        odom_init_z: 0.0

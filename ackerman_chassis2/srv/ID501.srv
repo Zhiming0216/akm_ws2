@@ -1,0 +1,32 @@
+# ackerman_chassis2/srv/ID501.srv
+# 0x501底盘反馈报文完整解析
+# 周期: 10ms, 波特率: 500k, 标准帧, 上位机->底层
+
+# Byte0: ControlMethod
+int32 throttle_enable      # Bit0: 油门使能（0/1）
+int32 steer_enable         # Bit1: 转向使能（0/1）
+int32 brake_enable         # Bit2: 制动使能（0/1）
+int32 light_enable         # Bit3: 灯光使能（0/1）
+int32 gear                 # Bit4-5: 期望档位（1:R 2:N 3:D）
+int32 drive_mode           # Bit6: 驱动控制选择（0:转速控制 1:车速控制）
+
+# Byte1-2: TargetMotoSpd
+int32 target_moto_rpm      # 期望电驱转速（0~3000 rpm）
+
+# Byte3: TargetMotoSpd
+int32 target_speed_kmh     # 期望车速（0~15 km/h，车速控制时用）
+
+# Byte4-5: TargetSteerAngle
+int32 target_steer_angle   # 期望转角（-250~250，单位：度，左负右正）
+
+# Byte6: TargetBrakePressure
+int32 target_brake_pressure # 期望刹车压力（0~80 bar）
+
+# Byte7: RES
+int32 head_light           # Bit0: 前照灯（0/1）
+int32 left_light           # Bit1: 左转灯（0/1）
+int32 right_light          # Bit2: 右转灯（0/1）
+
+---
+bool success
+string message
