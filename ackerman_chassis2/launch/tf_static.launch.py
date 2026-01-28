@@ -6,17 +6,18 @@ def generate_launch_description():
     # ==========================================
     # 角度转弧度计算
     # ==========================================
-    # 1. 中心雷达 (1.124) [新变化!]
+
+    # 1. 前雷达 (99.110)
+    front_roll   = -183.0 * (math.pi / 180.0)
+    front_pitch  = 0.0
+    front_yaw    = 0.0
+
+    # 2. 中心雷达 (99.111) 
     center_yaw   = 2.0 * (math.pi / 180.0)   # ≈ 0.0349
     center_pitch = 0.0
     center_roll  = 0.0
 
-    # 2. 前雷达 (1.3)
-    front_roll   = -183.0 * (math.pi / 180.0)
-    front_pitch  = 0.0
-    front_yaw    = 0.0
-    
-    # 3. 后雷达 (1.145)
+    # 3. 后雷达 (99.112)
     rear_roll    = 178.4  * (math.pi / 180.0)
     rear_pitch   = -0.1   * (math.pi / 180.0)
     rear_yaw     = -182.0 * (math.pi / 180.0)
@@ -31,7 +32,15 @@ def generate_launch_description():
         ),
 
         # ----------------------------------------------------------
-        # 2. 中心建图雷达 (Center 1.124)
+        # 2. 前避障雷达 (Front 99.110)
+        # ----------------------------------------------------------
+        Node(
+            package='tf2_ros', executable='static_transform_publisher', name='front_lidar_tf',
+            arguments=['1.30', '0.455', '1.0', str(front_yaw), str(front_pitch), str(front_roll), 'base_link', 'livox_frame_front']
+        ),
+
+        # ----------------------------------------------------------
+        # 3. 中心建图雷达 (Center 99.111)
         # ----------------------------------------------------------
         # 位置: X=0.52, Y=0.39 (39cm), Z=1.215
         # 旋转: Yaw=2度
@@ -41,15 +50,7 @@ def generate_launch_description():
         ),
 
         # ----------------------------------------------------------
-        # 3. 前避障雷达 (Front 1.3)
-        # ----------------------------------------------------------
-        Node(
-            package='tf2_ros', executable='static_transform_publisher', name='front_lidar_tf',
-            arguments=['1.30', '0.455', '1.0', str(front_yaw), str(front_pitch), str(front_roll), 'base_link', 'livox_frame_front']
-        ),
-
-        # ----------------------------------------------------------
-        # 4. 后避障雷达 (Rear 1.145)
+        # 4. 后避障雷达 (Rear 99.112)
         # ----------------------------------------------------------
         Node(
             package='tf2_ros', executable='static_transform_publisher', name='rear_lidar_tf',

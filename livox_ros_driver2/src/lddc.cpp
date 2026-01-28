@@ -215,7 +215,7 @@ void Lddc::PublishPointcloud2(LidarDataQueue *queue, uint8_t index) {
         // 获取当前这个雷达(index)在 Config 文件里的配置
         std::string config_frame_id = lds_->lidars_[index].livox_config.frame_id;
         
-        // 如果 Config 里写了 frame_id，就用 Config 里的！
+        // 如果 Config 里写了 frame_id，就用 Config 里的
         if (!config_frame_id.empty()) {
             cloud.header.frame_id = config_frame_id;
         }

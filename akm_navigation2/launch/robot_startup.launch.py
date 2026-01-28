@@ -23,7 +23,7 @@ def generate_launch_description():
     # 获取参数值 (这是 .yaml 路径)
     map_yaml_path = LaunchConfiguration('map')
 
-    # 🔥 核心魔法：使用 PythonExpression 动态把字符串里的 .yaml 替换为 .pcd
+    # 使用 PythonExpression 动态把字符串里的 .yaml 替换为 .pcd
     # 这样 NDT 就能拿到正确的点云地图路径
     map_pcd_path = PythonExpression(["'", map_yaml_path, "'.replace('.yaml', '.pcd')"])
 
@@ -74,7 +74,6 @@ def generate_launch_description():
     )
 
     # E. 启动 NDT 定位节点 (延时 6秒)
-    # 🔥 修改：将推导出的 .pcd 路径传给 NDT
     node_ndt = TimerAction(
         period=6.0,
         actions=[
@@ -94,7 +93,6 @@ def generate_launch_description():
     )
 
     # F. 启动 Nav2 导航 (延时 10秒)
-    # 🔥 修改：将原始的 .yaml 路径传给 Nav2
     launch_nav2 = TimerAction(
         period=10.0,
         actions=[
@@ -102,7 +100,6 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource(
                     os.path.join(nav2_pkg_dir, 'launch', 'akm_navigation.launch.py')
                 ),
-                # 这里通过 launch_arguments 把值传给下一层 launch
                 launch_arguments={
                     'map': map_yaml_path
                 }.items()
@@ -114,7 +111,7 @@ def generate_launch_description():
     # 3. 返回 LaunchDescription
     # ==============================
     return LaunchDescription([
-        map_arg, # 必须注册参数
+        map_arg,
         
         # 硬件层
         launch_chassis,

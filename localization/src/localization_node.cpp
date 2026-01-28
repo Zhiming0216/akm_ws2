@@ -38,7 +38,7 @@ public:
         std::string map_path;
         this->get_parameter("map_path", map_path);
         
-        // 🔥 修改 1: 提取地图文件名 (用于显示)
+        // 提取地图文件名 (用于显示)
         // 逻辑：找到最后一个 '/' 的位置，截取后面的部分
         size_t last_slash_idx = map_path.find_last_of("/\\");
         if (std::string::npos != last_slash_idx) {
@@ -56,10 +56,10 @@ public:
         // ================= 加载地图 =================
         pcl::PointCloud<pcl::PointXYZ>::Ptr map_cloud(new pcl::PointCloud<pcl::PointXYZ>());
         if (pcl::io::loadPCDFile(map_path, *map_cloud) == -1) {
-            RCLCPP_ERROR(this->get_logger(), "🔥 无法加载地图文件: %s", map_path.c_str());
+            RCLCPP_ERROR(this->get_logger(), "无法加载地图文件: %s", map_path.c_str());
             exit(1);
         }
-        RCLCPP_INFO(this->get_logger(), "✅ 地图 [%s] 加载成功，点数: %lu", current_map_name_.c_str(), map_cloud->size());
+        RCLCPP_INFO(this->get_logger(), "地图 [%s] 加载成功，点数: %lu", current_map_name_.c_str(), map_cloud->size());
 
         // ================= 配置 NDT_OMP =================
         ndt_.setResolution(ndt_res);          // 网格大小
@@ -84,7 +84,7 @@ public:
             "/initialpose", 10,
             std::bind(&LocalizationNode::initial_pose_callback, this, std::placeholders::_1));
 
-        RCLCPP_INFO(this->get_logger(), "🚀 NDT 定位节点启动成功！当前地图: %s", current_map_name_.c_str());
+        RCLCPP_INFO(this->get_logger(), "NDT 定位节点启动成功！当前地图: %s", current_map_name_.c_str());
     }
 
 private:
@@ -208,9 +208,9 @@ private:
                     tf_broadcaster_->sendTransform(tf_msg);
                 }
                 
-                // 🔥 修改 2: 在日志中包含地图名 (使用 current_map_name_)
+                // 在日志中包含地图名 (使用 current_map_name_)
                 // 使用 RCLCPP_INFO_THROTTLE (每1秒打印一次，防止刷屏太快看不清)
-                // 如果您想每一帧都看，就去掉 _THROTTLE 和 1000
+                // 如果想每一帧都看，就去掉 _THROTTLE 和 1000
                 if (ndt_.getFitnessScore() > 1.0) {
                      RCLCPP_WARN(this->get_logger(), "[%s] NDT 分数较高: %.4f", current_map_name_.c_str(), ndt_.getFitnessScore());
                 } else {
@@ -237,7 +237,7 @@ private:
     std::mutex mtx_; 
     Eigen::Matrix4d map_to_odom_matrix_ = Eigen::Matrix4d::Identity();
 
-    // 🔥 新增：用于存储地图文件名的成员变量
+    // 用于存储地图文件名的成员变量
     std::string current_map_name_;
 };
 

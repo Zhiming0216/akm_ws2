@@ -87,9 +87,7 @@ controller_server:
     goal_checker_plugins: ["general_goal_checker"] 
     general_goal_checker:
       plugin: "nav2_controller::SimpleGoalChecker"
-      # 🔥 修改 1: 位置容忍度保持 0.30 (30cm)
       xy_goal_tolerance: 0.30
-      # 🔥 修改 2: 角度容忍度收紧到 0.05 (约2.8度)，确保车头必须正
       yaw_goal_tolerance: 0.05
       stateful: True
 
@@ -98,8 +96,6 @@ controller_server:
 
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      
-      # 🔥 修改 3: 速度提升到 0.3 m/s
       desired_linear_vel: 0.3
       
       approach_velocity_scaling_dist: 1.0
@@ -326,7 +322,6 @@ velocity_smoother:
     max_accel: [3.0, 0.0, 3.0]
     max_decel: [-5.0, 0.0, -5.0]
     
-    # 🔥 修改 4: 平滑器限速同步提升到 0.3
     max_velocity: [0.3, 0.0, 1.0]
     min_velocity: [-0.3, 0.0, -1.0]
     

@@ -88,16 +88,13 @@ set(dependencies
 )
 
 # ==========================================================
-#  🔥 核心修改 1: 定义建图节点 (fastlio_mapping)
+#  修改 1: 定义建图节点 (fastlio_mapping)
 #  只包含 laserMapping.cpp
 # ==========================================================
 add_executable(fastlio_mapping 
   src/laserMapping.cpp 
   src/preprocess.cpp 
   include/ikd-Tree/ikd_Tree.cpp
-  # 如果你需要回环检测，请取消下面两行的注释：
-  # src/Scancontext.cpp
-  # src/loop_closure.cpp
 )
 
 target_include_directories(fastlio_mapping PUBLIC
@@ -111,12 +108,10 @@ target_link_libraries(fastlio_mapping
   ${PCL_LIBRARIES} 
   ${PYTHON_LIBRARIES} 
   Eigen3::Eigen
-  # 如果你需要回环检测，且安装了GTSAM，请取消下面这行的注释：
-  # gtsam
 )
 
 # ==========================================================
-#  🔥 核心修改 2: 定义纯里程计节点 (fastlio_odometry)
+#  修改 2: 定义纯里程计节点 (fastlio_odometry)
 #  只包含 laserOdometry.cpp
 # ==========================================================
 add_executable(fastlio_odometry 
@@ -157,7 +152,7 @@ ament_target_dependencies(fastlio_odometry ${dependencies})
 # ================= 安装规则 =================
 install(TARGETS 
   fastlio_mapping
-  fastlio_odometry  # 别忘了安装这个新节点
+  fastlio_odometry
   DESTINATION lib/${PROJECT_NAME}
 )
 

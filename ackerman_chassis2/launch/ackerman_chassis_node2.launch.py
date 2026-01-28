@@ -16,11 +16,11 @@ def generate_launch_description():
 
     return LaunchDescription([
         Node(
-            package='ackerman_chassis2',           # 包名，对应你的CMakeLists.txt里的project()
-            executable='ackerman_chassis_node2',   # 可执行文件名，对应你的add_executable生成的目标
-            name='chassis_driver_node2',           # 节点名，等价于命令行的 -r __node:=chassis_driver_node2
-            output='screen',                       # 输出到终端（screen），方便调试
-            parameters=[params_file],              # 加载参数文件（可以是yaml文件路径或Python字典）
+            package='ackerman_chassis2',          
+            executable='ackerman_chassis_node2',   
+            name='chassis_driver_node2',           
+            output='screen',                       
+            parameters=[params_file],              
         ),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(tf_launch_path)

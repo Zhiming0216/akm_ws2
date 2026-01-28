@@ -43,7 +43,7 @@ def generate_launch_description():
         description='RViz config file path'
     )
 
-    # 里程计节点（轻量级，仅odometry）
+    # 里程计节点
     odometry_node = Node(
         package='fast_lio',
         executable='fastlio_odometry',

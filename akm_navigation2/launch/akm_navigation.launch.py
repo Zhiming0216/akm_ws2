@@ -17,8 +17,6 @@ def generate_launch_description():
     default_param_path = os.path.join(akm_navigation2_dir, 'params', 'nav2_params.yaml')
 
     # ================= 3. 声明参数 (DeclareLaunchArgument) =================
-    # 🔥 关键：有了这一步，你才能在命令行用 map:=... 来传参
-    
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false',
@@ -35,7 +33,6 @@ def generate_launch_description():
         description='Full path to the ROS2 parameters file to use for all launched nodes')
 
     # ================= 4. 获取配置值 (LaunchConfiguration) =================
-    # 这里只负责“读取”上面声明的值
     use_sim_time = LaunchConfiguration('use_sim_time')
     map_yaml_path = LaunchConfiguration('map')
     nav2_param_path = LaunchConfiguration('params_file')
@@ -44,7 +41,7 @@ def generate_launch_description():
 
     # ================= 5. 定义节点 =================
 
-    # 🌟 变化 A: 单独启动地图服务器
+    # 单独启动地图服务器
     map_server_node = Node(
         package='nav2_map_server',
         executable='map_server',
@@ -54,7 +51,7 @@ def generate_launch_description():
                     {'yaml_filename': map_yaml_path}] # 这里会自动读取传入的地图路径
     )
 
-    # 🌟 变化 B: 启动生命周期管理器
+    # 启动生命周期管理器
     lifecycle_manager_node = Node(
         package='nav2_lifecycle_manager',
         executable='lifecycle_manager',
@@ -65,7 +62,7 @@ def generate_launch_description():
                     {'node_names': ['map_server']}]
     )
 
-    # 🌟 变化 C: 只调用 navigation_launch
+    # 只调用 navigation_launch
     nav2_navigation_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([nav2_bringup_dir, '/launch', '/navigation_launch.py']),
             launch_arguments={
@@ -86,7 +83,7 @@ def generate_launch_description():
     
     # ================= 6. 返回描述 =================
     return LaunchDescription([
-        # 必须把声明的参数加进来
+        # 把声明的参数加进来
         use_sim_time_arg,
         map_arg,
         params_file_arg,

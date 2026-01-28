@@ -1,25 +1,54 @@
 此为阿克曼底盘的工作空间介绍及操作说明书
 注：没有书写依赖安装，需要后续遇到进行补充
 
+设备：
+1、线控底盘*1
+2、英伟达orin nx 8GB*1
+3、io继电器*1
+4、mid360*3
+5、阿路比imu模块 nav3*1
+6、交换机*1
+7、路由器*1
+
+准备工作：
+为了项目统一性配置各设备ip:
+orin nx:192.168.99.168
+前雷达：192.168.99.110
+中雷达：192.168.99.111
+后雷达：192.168.99.112
+io控制模块：192.168.99.120
+
+网络结构：    
+                    /--->imu(usb)           /--->前雷达             
+线控底盘（can）--->nx（网口）--->交换机（网口）---->中雷达
+                                            \--->后雷达
+                                            \--->io控制
+
 项目的工作空间为akm_ws2
 功能包包括：
 ackerman_chassis2	        底盘的控制程序，进行报文的转换和解析，加入运动学，分析速度转角信息
 teleop_twist_keyboard       键盘控制程序
-livo_ros_driver2	        雷达驱动程序（mid360官方程序）
-FAST_LIO		            快速激光雷达惯性里程计，建图定位使用，已经修改为pointcloud2、
-
-pcd2pgm                     将扫描到的3D点云转化为可以导航使用的2D栅格地图
-pointcloud_to_laserscan     将雷达的3D点云转化为laserscan
+livo_ros_driver2	        雷达驱动程序（mid360官方程序）（已配置为发布pointcloud2）
+imu_ros2                    imu模块的ros2功能包
+FAST_LIO		            快速激光雷达惯性里程计，建图定位使用，已经修改为pointcloud2
+ndt_omp_ros2                ndt定位算法
+localization                ndt定位实现
 navigation2                 nav2导航包
 akm_navigation2             阿克曼底盘的导航算法
-imu_ros2                    imu模块的ros2功能包
-
+pcd2pgm                     将扫描到的3D点云转化为可以导航使用的2D栅格地图（作为地图转化）
+-------------------------------------------------------------------------------
 底盘运动控制
+colcon build --packages-select ackerman_chassis2
 ros2 launch ackerman_chassis2 ackerman_chassis_node2.launch.py
 -------------------------------------------------------------------------------
-
+键盘控制
+colcon build --packages-select teleop_twist_keyboard
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+-------------------------------------------------------------------------------
 mid360雷达
-配置有线ip，可以在windows上位机上查看，Points IP配置为IPv4地址（例：192.168.1.161），Lidar IP（例：192.168.1.3）
+配置有线ip，可以在windows上位机上配置
+Points IP配置为IPv4地址（例：192.168.99.168）
+Lidar IP（例：192.168.99.110）
 安装Livox-SDK2:
 先安装CMAKE
 sudo apt install cmake
@@ -30,38 +59,28 @@ $ mkdir build
 $ cd build
 $ cmake .. && make -j
 $ sudo make install
-进入/home/user/3rdparty/Livox-SDK2/samples/livox_lidar_quick_start后更改mid360_config.json中的host_ip，更改成IPv4的IP（例：192.168.1.161）
+进入/home/user/3rdparty/Livox-SDK2/samples/livox_lidar_quick_start后更改mid360_config.json中的host_ip，更改成nx的IP（例：192.168.99.168）
 安装livox_ros_driver2驱动包：
 在src中git clone https://github.com/Livox-SDK/livox_ros_driver2.git
-编译需要进入/home/user/akm_ws/src/livox_ros_driver2
-运行./build.sh humble
 更改config文件：
-进入/home/user/akm_ws/src/livox_ros_driver2/config
-更改host_net_info中的ip为IPv4地址（例：192.168.1.161）
-更改lidar_configs中的ip为Lidar IP（例：192.168.1.3）
-之后可以运行launch文件进行测试
-ros2 launch livox_ros_driver2 msg_MID360_launch.py
-ros2 launch livox_ros_driver2 rviz_MID360_launch.py
-
-已根据功能不同进行了发布格式的调整，分为：
-建图使用：
-ros2 launch livox_ros_driver2 msg_MID360_launch.py
-导航使用：
-ros2 launch livox_ros_driver2 nav_MID360_launch.py
------------------------------------------------------------------------------
-
-FAST_LIO
-src下运行git clone -b ROS2 https://github.com/hku-mars/FAST_LIO.git --recursive
-进入include/ikd-Tree中
-加入ikd_Tree.h和ikd_Tree.cpp
-文件在https://github.com/hku-mars/ikd-Tree/tree/e2e3f4e9d3b95a9e66b1ba83dc98d4a05ed8a3c4
-cd进入到工作空间中运行rosdep install --from-paths src --ignore-src -y
-编译可以使用雷达的编译方法
-进入/home/user/akm_ws/src/livox_ros_driver2
+进入/home/user/akm_ws2/src/livox_ros_driver2/config
+更改host_net_info中的ip为nx地址（例：192.168.99.168）
+更改lidar_configs中的ip为Lidar IP（例：192.168.99.110）（多雷达可复制多个配置）
+编译需要进入/home/user/akm_ws2/src/livox_ros_driver2
 运行./build.sh humble
-运行：
-ros2 launch livox_ros_driver2 msg_MID360_launch.py 
-ros2 launch fast_lio mapping.launch.py config_file:=mid360.yaml
+之后可以运行launch文件进行测试
+ros2 launch livox_ros_driver2 msg_MID360_all.launch.py
+此命令会使三个雷达同时运行并发布三个不同的topic，可选择使用，但都是pointcloud2
+-----------------------------------------------------------------------------
+imu
+colcon build --packages-select imu_ros2
+ros2 launch imu_ros2 lpms_nav3_launch.py
+-----------------------------------------------------------------------------
+FAST_LIO
+建图
+ros2 launch fast_lio mapping.launch.py
+激光里程计
+ros2 launch fast_lio odometry.launch.py
 关闭时点云默认不保存生成PCD文件
 保存地图：
 启动rqt，在service服务中使用map_save
@@ -69,107 +88,35 @@ ros2 launch fast_lio mapping.launch.py config_file:=mid360.yaml
 查看使用PCL Viewer
 sudo apt install pcl-tools
 cd /home/user/akm_ws/src/FAST_LIO/PCD
-pcl_viewer scans.pcd
+pcl_viewer test.pcd
 -----------------------------------------------------------------------------
-
 点云模型转2D栅格地图
-在/home/user/akm_ws/src/pcd2pgm/config下的pcd2pgm.yaml中修改要转换的pcd文件路径
+在/home/user/akm_ws2/src/pcd2pgm/config下的pcd2pgm.yaml中修改要转换的pcd文件路径
 然后运行：
 ros2 launch pcd2pgm pcd2pgm_launch.py
 保存：
 ros2 run nav2_map_server map_saver_cli -f <需要修改的文件名>
 默认保存在/home/user下
-
-
 -----------------------------------------------------------------------------
-
+ndt定位
+单独编译
+colcon build --packages-select localization
+可指定地图文件
+ros2 launch localization ndt_localization.launch.py map_path:=/home/user/akm_ws2/map/HPCN.pcd
+-----------------------------------------------------------------------------
 导航功能:
 创建了阿克曼专属导航功能包，将使用功能包中的yaml文件进行配置，可单独进行编译
 地图文件放在该功能包的maps文件夹下
-
-ros2 launch ackerman_chassis2 ackerman_chassis_node2.launch.py
-ros2 launch livox_ros_driver2 msg_MID360_launch.py 
-ros2 launch pointcloud_to_laserscan sample_pointcloud_to_laserscan_launch.py
-ros2 launch fast_lio mapping.launch.py
-ros2 launch ndt_localization test_ndt.launch.py
-ros2 launch akm_navigation2 navigation2.launch.py
-
------------------------------------------------------------------------------
-查看tf
-ros2 run tf2_tools view_frames
-ros2 launch akermann_drive_sk_node chassis_drive_node_launch.py
-编译单独功能包
-colcon build --packages-select akermann_drive_sk_node
-colcon build --packages-select akm_navigation2
-colcon build --packages-select ndt_localization
-ros2 topic echo /odom --field pose.pose
-candump can0
-ros2 launch akm_navigation2 ioModbusSwitch.launch.py
-
-
------------------------------------------------------------------------------
-
-sudo tcpdump -i eno1 src 192.168.99.110 -n
-sudo tcpdump -i eno1 src 192.168.99.111 -n
-sudo tcpdump -i eno1 src 192.168.99.112 -n
-对应99.111
-sudo tcpdump -i eno1 udp port 56301 -n
-对应99.110
-sudo tcpdump -i eno1 udp port 56311 -n
-对应99.112
-sudo tcpdump -i eno1 udp port 56321 -n
-ros2 topic hz /livox/center/lidar
-ros2 topic hz /livox/front/lidar
-ros2 topic hz /livox/rear/lidar
-底盘驱动
-colcon build --packages-select ackerman_chassis2
-ros2 launch ackerman_chassis2 ackerman_chassis_node2.launch.py
-
-键盘控制
-colcon build --packages-select teleop_twist_keyboard
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
-
-# 中心雷达（99.111）（CustomMsg）（fastlio使用）
-# ros2 launch livox_ros_driver2 lidar_center.launch.py
-# 前雷达（99.110）（PointCloud2）
-# ros2 launch livox_ros_driver2 lidar_front.launch.py
-# 后雷达（99.112）（PointCloud2）
-# ros2 launch livox_ros_driver2 lidar_rear.launch.py
-
-雷达启动命令
-ros2 launch livox_ros_driver2 msg_MID360_all.launch.py
-
-imu
-colcon build --packages-select imu_ros2
-ros2 launch imu_ros2 lpms_nav3_launch.py
-
-点云转雷达
-colcon build --packages-select pointcloud_to_laserscan
-ros2 launch pointcloud_to_laserscan sample_pointcloud_to_laserscan_launch.py
-
-fast_lio相关
-colcon build --packages-select fast_lio
-建图
-ros2 launch fast_lio mapping.launch.py
-激光里程计
-ros2 launch fast_lio odometry.launch.py
-
-ndt定位
-colcon build --packages-select localization
-ros2 run localization ndt_localization_node
-ros2 launch localization ndt_localization.launch.py
-ros2 launch localization ndt_localization.launch.py map_path:=/home/user/akm_ws2/map/HPCN.pcd
-
-点云地图转栅格地图
-colcon build --packages-select pcd2pgm
-ros2 launch pcd2pgm pcd2pgm_launch.py
-保存指令
-ros2 run nav2_map_server map_saver_cli -f <YOUR_MAP_NAME>
-
-nav2导航相关
 colcon build --packages-select akm_navigation2
 ros2 launch akm_navigation2 akm_navigation.launch.py
+可指定地图文件
 ros2 launch akm_navigation2 akm_navigation.launch.py map:=/home/user/akm_ws2/map/HPCN.yaml
+-----------------------------------------------------------------------------
 一键启动指令
 ros2 launch akm_navigation2 robot_startup.launch.py map:=/home/user/akm_ws2/map/HPCN.yaml
-
+-----------------------------------------------------------------------------
+常用指令
+查看tf
+ros2 run tf2_tools view_frames
+candump can0
+-----------------------------------------------------------------------------

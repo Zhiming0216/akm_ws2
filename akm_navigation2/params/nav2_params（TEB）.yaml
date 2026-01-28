@@ -73,22 +73,16 @@ controller_server:
   ros__parameters:
     odom_topic: /odom
     use_sim_time: False
-    controller_frequency: 20.0  # 频率20Hz稳 (你的硬件)
+    controller_frequency: 20.0  # 频率20Hz稳
     controller_plugin_types: ["teb_local_planner::TebLocalPlannerROS"]
     controller_plugins: ["FollowPath"]
     FollowPath:
       plugin: "teb_local_planner::TebLocalPlannerROS"  # TEB插件
-      
-      # xy_goal_tolerance: 0.3     # 位置容忍（米），推荐0.3~0.5（你车大，0.3够准又不卡；太小如0.1容易转圈）
-      # yaw_goal_tolerance: 0.3   # 角度容忍（弧度），约17度，推荐0.3~0.5（阿克曼车转弯慢，别设太小不然原地转死）
-      # stateful: True            # 可选：记住上次路径，继续用（稳）
-
       teb_autosize: 1.0
       dt_ref: 0.3
       dt_hysteresis: 0.1
       max_samples: 500
       global_plan_overwrite_orientation: False
-      # max_vel_x_backwards: 0.4     # 最大倒车速度（正值，比如0.3 m/s；设0就完全禁止倒车）
       allow_init_with_backwards_motion: True
       max_global_plan_lookahead_dist: 3.0
       global_plan_viapoint_sep: 0.3
@@ -97,22 +91,22 @@ controller_server:
       feasibility_check_no_poses: 2
       publish_feedback: False
 
-      # Robot 参数 (适配你的底盘)
-      max_vel_x: 0.73  # 你的最大前进速度 (代码算的)
-      max_vel_theta: 0.56  # 最大转速 (你的R限算的)
+      # Robot 参数 
+      max_vel_x: 0.73  # 你的最大前进速度 
+      max_vel_theta: 0.56  # 最大转速 
       acc_lim_x: 2.5
       acc_lim_theta: 3.2
 
-      footprint_model:  # 改polygon大底盘
+      footprint_model: 
         type: "polygon"
-        vertices: "[ [1.445, 0.575], [1.445, -0.575], [-0.405, -0.575], [-0.405, 0.575] ]"  # 你的足迹
+        vertices: "[ [1.445, 0.575], [1.445, -0.575], [-0.405, -0.575], [-0.405, 0.575] ]"  
       
       free_goal_vel: False
       
       # Obstacles 参数 (避障适中)
 
-      min_obstacle_dist: 0.5  # 最小障碍距 (大车宽松)
-      inflation_dist: 0.6  # 膨胀距 (大点路径宽)
+      min_obstacle_dist: 0.5  # 最小障碍距 
+      inflation_dist: 0.6  # 膨胀距 
       include_costmap_obstacles: True
       costmap_obstacles_behind_robot_dist: 1.0
       obstacle_poses_affected: 15
@@ -124,7 +118,7 @@ controller_server:
       costmap_converter_spin_thread: True
       costmap_converter_rate: 5
 
-      # Optimization 参数 (强跟全局)
+      # Optimization 参数 
 
       no_inner_iterations: 5
       no_outer_iterations: 4
@@ -145,7 +139,7 @@ controller_server:
       weight_inflation: 0.2
       weight_dynamic_obstacle: 10.0
       weight_dynamic_obstacle_inflation: 0.2
-      weight_viapoint: 50.0  # 超强跟路径 (直线稳)
+      weight_viapoint: 50.0  # 跟路径 (直线稳)
       weight_adapt_factor: 2.0
 
       # Homotopy Class Planner (关，防复杂弯)
@@ -212,29 +206,29 @@ local_costmap:  # 局部costmap (实时避障, rolling_window)
 
         # 来源 (/scan)
         observation_sources: "front_lidar rear_lidar"
-        # 🌟 关键 3：配置前雷达
+        # 配置前雷达
         front_lidar:
-          topic: /livox/front/lidar          # 你的前雷达 topic
+          topic: /livox/front/lidar          # 前雷达 topic
           sensor_frame: livox_frame_front    # 必须和 TF 树一致
           observation_persistence: 0.0
           expected_update_rate: 0.0
           data_type: "PointCloud2"
           obstacle_min_range: 0.25
-          min_obstacle_height: 0.15          # 🔥 重点：地面在 Z=0，所以这里设 0.15 滤掉地板
+          min_obstacle_height: 0.15          # 地面在 Z=0，所以这里设 0.15 滤掉地板
           max_obstacle_height: 0.8
           inf_is_valid: true
           clearing: True
           marking: True
 
-        # 🌟 关键 4：配置后雷达
+        # 配置后雷达
         rear_lidar:
-          topic: /livox/rear/lidar           # 你的后雷达 topic
+          topic: /livox/rear/lidar           # 后雷达 topic
           sensor_frame: livox_frame_rear     # 必须和 TF 树一致
           observation_persistence: 0.0
           expected_update_rate: 0.0
           data_type: "PointCloud2"
           obstacle_min_range: 0.25
-          min_obstacle_height: 0.15          # 🔥 重点：滤掉地板
+          min_obstacle_height: 0.15          # 滤掉地板
           max_obstacle_height: 0.8
           inf_is_valid: true
           clearing: True

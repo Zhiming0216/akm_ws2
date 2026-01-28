@@ -17,7 +17,7 @@ def generate_launch_description():
         description='点云地图(.pcd)的绝对路径'
     )
 
-    # 雷达话题参数 (可选，方便以后修改)
+    # 雷达话题参数
     lidar_topic_arg = DeclareLaunchArgument(
         'lidar_topic',
         default_value='/livox/center/lidar',
@@ -50,12 +50,12 @@ def generate_launch_description():
     # 3. 定义节点 (Node)
     # ==========================================
     ndt_node = Node(
-        package='localization',          # 🔥 请确保这里是你的 package.xml 里的包名
-        executable='ndt_localization_node', # 🔥 请确保这里是 CMakeLists.txt 里 add_executable 的名字
-        name='ndt_localization_node',    # 节点名
-        output='screen',                 # 将日志打印到终端
+        package='localization',          
+        executable='ndt_localization_node', 
+        name='ndt_localization_node',    
+        output='screen',                 
         parameters=[{
-            'map_path': map_path,        # 将 Launch 参数传给 C++ 节点的 param
+            'map_path': map_path,        
             'lidar_topic': lidar_topic,
             'ndt_resolution': ndt_resolution,
             'ndt_step_size': ndt_step_size

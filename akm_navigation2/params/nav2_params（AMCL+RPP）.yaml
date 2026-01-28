@@ -146,20 +146,20 @@ controller_server:
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       
-      # === 速度与安全距离 (我们计算过的黄金参数) ===
+      # === 速度与安全距离 ===
       desired_linear_vel: 0.3        # 期望巡航速度 0.3 m/s
       max_allowed_time_to_collision_up_to_carrot: 3.5  # 0.3m/s * 3.5s ≈ 1.05米 (提前1米刹车)
       use_collision_detection: true  # 开启碰撞检测
       
-      # === 预瞄距离 (防画龙) ===
+      # === 预瞄距离 ===
       lookahead_dist: 2.0            # 预瞄 2.0 米
       min_lookahead_dist: 1.0        # 最小看 1.0 米
       max_lookahead_dist: 3.0        # 最远看 3.0 米
       lookahead_time: 2.0            # 动态调整
       
       # === 阿克曼底盘约束 ===
-      use_rotate_to_heading: false   # 禁止原地旋转 (大车必备)
-      allow_reversing: true         # 暂时禁止倒车 (先跑通前进)
+      use_rotate_to_heading: false   # 禁止原地旋转
+      allow_reversing: true         # 暂时禁止倒车
       max_angular_accel: 1.0         # 限制角加速度，防止猛打方向
       max_robot_pose_search_dist: 10.0
       

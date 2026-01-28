@@ -31,7 +31,6 @@ public:
     : Node("chassis_driver_node2", rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)),
       running_(true)
     {
-        // === 修改：彻底移除所有odom相关参数（pub_odom_tf、odom_init_x/y/z）===
         // 只读取底盘控制必须的参数
         this->get_parameter("can_dev", can_dev_);
         this->get_parameter("wheelbase", wheelbase_);
@@ -84,9 +83,6 @@ public:
         current_gear_ = 2;
         current_rpm_ = 0;
         current_steer_wheel_deg_ = 0;
-
-        // === 新增：启动日志，明确说明已移除odom ===
-        RCLCPP_INFO(this->get_logger(), "底盘驱动节点启动完成 🚀 已彻底移除所有 odom 功能（不发布/odom、不广播TF、不积分里程计）");
     }
 
     ~ChassisDriverNode()
@@ -173,7 +169,7 @@ private:
 
     void performSwitchCombination()
     {
-        RCLCPP_INFO(this->get_logger(), "开始执行模式切换组合：先关 → 断开 → 再开 🚀");
+        RCLCPP_INFO(this->get_logger(), "开始执行模式切换组合：先关 → 断开 → 再开 ");
 
         const std::array<uint8_t, 12> off_packet = {
             0x00, 0x01, 0x00, 0x00, 0x00, 0x06, 0x01, 0x06, 0x00, 0x00, 0x00, 0x00
@@ -196,7 +192,7 @@ private:
         performSwitchCombination();
         response->success = true;
         response->message = "已执行关→开组合，模式已切换";
-        RCLCPP_INFO(this->get_logger(), "IO切换服务被调用 👌");
+        RCLCPP_INFO(this->get_logger(), "IO切换服务被调用");
     }
 
     // ========== ID501服务回调 ==========
@@ -433,8 +429,6 @@ private:
             }
         }
     }
-
-    // === 删除：所有odom相关代码（变量、积分、publishOdomAndTF、TF广播器等）全部移除 ===
 };
 
 int main(int argc, char const *argv[])

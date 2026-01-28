@@ -28,7 +28,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
-# PCL 转换与工具 (关键！)
+# PCL 转换与工具
 find_package(pcl_conversions REQUIRED)
 find_package(pcl_ros REQUIRED) # <--- 必须有这个才能用 transformPointCloud
 
@@ -36,8 +36,6 @@ find_package(pcl_ros REQUIRED) # <--- 必须有这个才能用 transformPointClo
 find_package(PCL REQUIRED)
 
 # 查找 NDT_OMP 加速库
-# 注意：根据你的环境，包名可能是 'ndt_omp' 或 'ndt_omp_ros2'
-# 如果报错找不到，请尝试把这里改为 find_package(ndt_omp REQUIRED)
 find_package(ndt_omp_ros2 REQUIRED) 
 
 # 查找 OpenMP (NDT_OMP 必须依赖这个)
@@ -60,7 +58,7 @@ add_executable(ndt_localization_node src/localization_node.cpp)
 target_include_directories(ndt_localization_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   ${PCL_INCLUDE_DIRS}
-  ${ndt_omp_ros2_INCLUDE_DIRS} # 如果上面改了包名，这里也要改
+  ${ndt_omp_ros2_INCLUDE_DIRS}  
 )
 
 # ============================================
@@ -84,7 +82,7 @@ ament_target_dependencies(ndt_localization_node
   tf2_ros
   tf2_eigen
   pcl_conversions
-  pcl_ros  # <--- 确保 pcl_ros 被链接
+  pcl_ros  # 确保 pcl_ros 被链接
 )
 
 # ============================================
@@ -95,13 +93,13 @@ install(TARGETS ndt_localization_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# # 安装 Launch 文件和 Param 文件 (如果有)
+# # 安装 Launch 文件和 Param 文件
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*"
 )
 
-# 安装地图文件夹 (如果你想把地图打包进 workspace)
+# 安装地图文件夹
 install(DIRECTORY map
   DESTINATION share/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.pcd"
